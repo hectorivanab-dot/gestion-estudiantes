@@ -1,7 +1,7 @@
 venv/
 
 .env
-config/serviceAccountKey.json
+config/serviceAccountKeyGE.json
 
 *.sqlite3
 
