@@ -102,3 +102,35 @@ def login(request):
         except Exception as e:
             messages.error(request, f"Error inesperado: {str(e)}")
     return render(request, 'login.html')
+
+def cerrar_sesion(request):
+    request.session.flush()
+    messages.info(request, 'Has cerrado sesión correctamente')
+    return redirect('login')
+
+@login_required_firebase #Verifica que el user esté logueado
+def dashboard(request):
+    # Este es el panl principal, este solo lo permite si el decorador lo permite
+    # Recuparar los datos de Firestore
+
+    uid= request.session.get('uid')
+    datosUser = {}
+
+    try:
+        # Consulta a Firestore usando SDK 
+        doc_ref = db.collection('educadores').document(uid)
+        doc = doc_ref.get()
+
+        if doc.exists:
+            datosUser = doc.to_dict()
+        else:
+            # Si entra en el out pero no tiene un perfil en Firestore vamos a manejar el caso
+            datosUser = {
+                'email' : request.session.get('email'),
+                'rol' : request.session.get('rol'),
+                'uid' : request.session.get('uid'),
+                'fecha_registro' : firestore.SERVER_TIMESTAMP
+            }
+    except Exception as e:
+        messages.error(request, f'Error al cargar los datos de la base de datos: {e}')
+    return render(request, 'dashboard.html', {'datos': datosUser})
