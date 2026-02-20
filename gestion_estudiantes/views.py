@@ -37,3 +37,16 @@ def registro_usuario(request):
         except Exception as e:
             mensaje = f"Error: {e}"
     return render(request, 'registro.html', {'mensaje' : mensaje})
+
+def login_required_firebase(view_func):
+    # Este decorador personalizado va a proteger nuestras vistas
+    # si el usuario no ha iniciado sesión.
+    # Si el UID no existe, lo va a enviar a iniciar sesión.
+
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if 'uid' not in request.session:
+            messages.warning(request, "Warning, no has iniciado sesión")
+            return redirect('login')
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
