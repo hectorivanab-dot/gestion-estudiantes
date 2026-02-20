@@ -134,3 +134,25 @@ def dashboard(request):
     except Exception as e:
         messages.error(request, f'Error al cargar los datos de la base de datos: {e}')
     return render(request, 'dashboard.html', {'datos': datosUser})
+
+@login_required_firebase
+def listar_estudiantes(request):
+    """
+    READ: Recuperar los estudiantes del usuario desde firestore
+    """
+
+    uid = request.session.get('uid')
+    estudiantes = []
+
+    try:
+        #Filtramos los estudiantes que registro del usuario
+
+        docs = db.collection('estudiantes').where('usuario_id', '==', uid).stream()
+        for doc in docs:
+            estudiante = doc.to_dict()
+            estudiante['id'] = doc.id
+            estudiantes.append(estudiante)
+    except Exception as e:
+        messages.error(request, f"Hubo un error al obtener los estudiantes {e}")
+    
+    return render(request, 'estudiantes/listar.html', {'estudiantes' : estudiantes})
