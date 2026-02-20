@@ -50,3 +50,55 @@ def login_required_firebase(view_func):
             return redirect('login')
         return view_func(request, *args, **kwargs)
     return _wrapped_view
+
+# logica para solicitarle a Google la validación
+
+def login(request):
+    if ('uid' in request.session):
+        return redirect('dashboard')
+    
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        apiKey = os.getenv('FIREBASE_WEB_API_KEY')
+
+        # Endpoind oficial de Google
+        url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={apiKey}"
+
+        payload = {
+            "email" : email,
+            "password" : password,
+            "returnSecureToken" : True
+        }
+
+        try:
+
+            # petición http al servicio de autenticación de google
+            response = requests.post(url, json=payload)
+            data = response.json()
+
+            if response.status_code == 200:
+                # All good
+                request.session['uid'] = data['localId']
+                request.session['email'] = data['email']
+                request.session['idToken'] = data['idToken']
+                messages.success(request, f'✔ Acceso correcto al sistema')
+                return redirect('listar_estudiantes')
+            else:
+                # Error: Analizarlo
+                errorMessage = data.get('error', {}).get('message', 'UNKNOWN ERROR')
+
+                errores_comunes = {
+                    'INVALID_LOGIN_CREDENTIALS': 'La contraseña es incorrecta o el correo no es válido.',
+                    'EMAIL_NOT_FOUND': 'Este correo no está registrado en el sistema.',
+                    'USER_DISABLED': 'Esta cuenta ha sido inhabilitada por el administrador.',
+                    'TOO_MANY_ATTEMPTS_TRY_LATER': 'Demasiados intentos fallidos. Espere unos minutos.'
+                }
+
+                mensaje_usuario = errores_comunes.get(errorMessage, "Error de autenticación, revisa tus credenciales")
+                messages.error(request, mensaje_usuario)
+        except requests.exceptions.RequestException as e:
+            messages.error(request, "Error de conexión con el servidor")
+        except Exception as e:
+            messages.error(request, f"Error inesperado: {str(e)}")
+    return render(request, 'login.html')
