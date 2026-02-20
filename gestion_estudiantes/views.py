@@ -156,3 +156,42 @@ def listar_estudiantes(request):
         messages.error(request, f"Hubo un error al obtener los estudiantes {e}")
     
     return render(request, 'estudiantes/listar.html', {'estudiantes' : estudiantes})
+
+@login_required_firebase # Verifica que el usuario esta loggeado
+def anadir_estudiante(request):
+    """
+    CREATE: Reciben los datos desde el formulario y se suben a Firebase
+    """
+    if (request.method == 'POST'):
+        nombre_estudiante = request.POST.get('nombre_estudiante')
+        edad = request.POST.get('edad')
+        correo = request.POST.get('correo')
+        uid = request.session.get('uid')
+
+        try:
+            db.collection('estudiantes').add({
+                'nombre_estudiante': nombre_estudiante,
+                'edad': edad,
+                'correo' : correo,
+                'usuario_id': uid,
+                'fecha_registro': firestore.SERVER_TIMESTAMP
+            })
+            messages.success(request, "estudiante registrado con exito")
+            return redirect('listar_estudiantes')
+        except Exception as e:
+            messages.error(request, f"Error al registrar al estudiante {e}")
+        
+    return render(request, 'estudiantes/form.html')
+
+@login_required_firebase # Verifica que el usuario esta loggeado
+def eliminar_estudiante(request, estudiante_id):
+    """
+    DELETE: Eliminar un documento especifico por id
+    """
+    try:
+        db.collection('estudiantes').document(estudiante_id).delete()
+        messages.success(request, "🗑️ estudiante eliminado.")
+    except Exception as e:
+        messages.error(request, f"Error al eliminar: {e}")
+
+    return redirect('listar_estudiantes')
