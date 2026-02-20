@@ -195,3 +195,44 @@ def eliminar_estudiante(request, estudiante_id):
         messages.error(request, f"Error al eliminar: {e}")
 
     return redirect('listar_estudiantes')
+
+@login_required_firebase # Verifica que el usuario esta loggeado
+def editar_estudiante(request, estudiante_id):
+    """
+    UPDATE: Recupera los datos del estudiante especifico y actualiza los campos en firebase
+    """
+    uid = request.session.get('uid')
+    estudiante_ref = db.collection('estudiantes').document(estudiante_id)
+
+    try:
+        doc = estudiante_ref.get()
+
+        if not doc.exists:
+            messages.error(request, "El estudiante no existe")
+            return redirect('listar_estudiante')
+        
+        estudiante_data = doc.to_dict()
+
+        if estudiante_data.get('usuario_id') != uid:
+            messages.error(request, "No tienes permiso para editar este estudiante")
+            return redirect('listar_estudiante')
+        
+        if request.method == 'POST':
+            nuevo_titulo = request.POST.get('nombre_estudiante')
+            nueva_edad = request.POST.get('edad')
+            nuevo_correo = request.POST.get('correo')
+
+            estudiante_ref.update({
+                'nombre_estudiante': nuevo_titulo,
+                'edad': nueva_edad,
+                'correo': nuevo_correo,
+                'fecha_actualizacion': firestore.SERVER_TIMESTAMP
+            })
+
+            messages.success(request, "✅ estudiante actualizado correctamente.")
+            return redirect('listar_estudiantes')
+    except Exception as e:
+        messages.error(request, f"Error al editar el estudianteo: {e}")
+        return redirect('listar_estudiantes')
+    
+    return render(request, 'estudiantes/editar.html', {'estudiante': estudiante_data, 'id': estudiante_id})
