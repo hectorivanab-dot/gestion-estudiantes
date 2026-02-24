@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡BIENVENIDO!</title>
+    <style>
+        .bienvenido{
+            text-align: center;
+            padding: 50px;
+            font-family: Arial, sans-serif;
+        }
+
+        #aRegistro{
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        #aLogin{
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .buttons{
+            margin-top: 30px;
+            background-color: #0b0b0b;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="bienvenido">
+        <h1>¡BIENVENIDO!</h1>
+        <p>Sistema de Gestión de Estudiantes</p>
+        <p>Por favor,si eres Profesor/Instructor selecciona una opción para continuar:</p>
+        <div class="buttons">
+            <a href="{% url 'registro' %}" id="aRegistro">Registrarme</a>
+            <a href="{% url 'login' %}" id="aLogin">Iniciar Sesión</a>
+        </div>
+    </div>
+</body>
+</html>

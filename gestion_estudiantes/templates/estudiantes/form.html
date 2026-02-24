@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuevo Estudiante</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .main-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background: #1a1a1a;
+            padding: 35px;
+            border-radius: 15px;
+            width: 300px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        h2 {
+            margin-top: 0;
+            text-align: center;
+            width: 100%;
+            color: #4CAF50;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            box-shadow: 0 0 6px #2196F3;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: #4CAF50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #43a047;
+            transform: scale(1.04);
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #f44336;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            background: #ff9800;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Gestión de estudiantes</h1>
+
+    <div class="main-content">
+        <div class="card">
+            <h2>Crear Nuevo estudiante</h2>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <label>Nombre del/la estudiante</label>
+                <input type="text" name="nombre_estudiante" placeholder="Nombre del/la estudiante" required>
+
+                <label>Edad del/la estudiante</label>
+                <input type="number" name="edad" placeholder="Edad del/la estudiante" required>
+
+                <label>Correo del/la estudiante</label>
+                <input type="email" name="correo" placeholder="Correo del/la estudiante" required>
+
+                <button type="submit">Guardar estudiante</button>
+            </form>
+
+            <a href="{% url 'listar_estudiantes' %}">
+                ◀ Volver al listado
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
