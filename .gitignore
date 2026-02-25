@@ -1,0 +1,8 @@
+venv/
+
+.env
+config/serviceAccountKeyGE.json
+
+*.sqlite3
+
+__pycache__/
